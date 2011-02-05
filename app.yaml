@@ -1,0 +1,12 @@
+application: pivotalapp
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /test.*
+  script: gaeunit/gaeunit.py
+  
+- url: /.*
+  script: main.py
+
