@@ -1,0 +1,34 @@
+<html>
+<script type="text/javascript">
+function updateValue() {
+    var jsonrequest = document.getElementById('jsonrequest')
+    var solution = document.getElementById('solution')
+    var tests = document.getElementById('tests')
+    var obj = {solution: solution.value, tests: tests.value}
+    jsonrequest.value = JSON.stringify(obj)
+}
+</script>
+<body>
+<h2>Python verifier</h2>
+
+<br>
+Solution code:<br>
+<textarea id="solution" rows="10" cols="80">number = 2
+wizard = 'Oz'
+def addOne(x): 
+  return x+1</textarea>
+
+<br>
+Tests:<br>
+<textarea id="tests" rows="10" cols="80">&gt;&gt;&gt; number
+ 2
+&gt;&gt;&gt; wizard
+ 'Oz'
+&gt;&gt;&gt; addOne(2)
+  3</textarea>
+<form action="/verify" method="POST">
+<input type="hidden" name="jsonrequest" id="jsonrequest"/>
+<input type="submit" onclick="updateValue()"></input>
+</form>
+</body>
+</html>
