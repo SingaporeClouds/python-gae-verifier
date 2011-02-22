@@ -65,6 +65,34 @@ class VerifyHandler(webapp.RequestHandler):
     #Change the MIME type to json.
     self.response.out.write(result)
 
+class KeepAliveHandler(webapp.RequestHandler):
+  """ Allows the functions defined in the RPCMethods class to be RPCed."""
+  def __init__(self):
+    webapp.RequestHandler.__init__(self)
+
+  def get(self):
+    #The request is passed in as json in the variable jsonrequest
+    jsonrequest = '{"solution": "b=2", "tests": ">>> b\n 2"}'
+    logging.info("Keep alive: %s",jsonrequest)
+    #The json request is passed to run_local and the result is written out as the response.
+    try:
+        protocol = 'https' if os.environ.get('HTTPS') == 'on' else 'http'
+        url = '%s://%s/verify' % (protocol, os.environ.get('HTTP_HOST'))
+        logging.info('calling verifier: %s', url)
+        result = urlfetch.fetch(url = url,
+                                payload = urllib.urlencode({'jsonrequest': jsonrequest}),
+                                method = urlfetch.POST,
+                                deadline = 3,
+                                headers = {'Content-Type': 'application/x-www-form-urlencoded'})
+        result = result.content
+    except Exception, e:
+        errors = traceback.format_exc()
+        logging.info('Error while executing keep_alive: %s', errors)
+        result = simplejson.dumps({'errors': '%s' % e})
+    #logging.info('######## jsonResponse =%s', jsonResponse)
+    #Change the MIME type to json.
+    self.response.out.write(result)
+
 class RunHandler(webapp.RequestHandler):
   """ Allows the functions defined in the RPCMethods class to be RPCed."""
   def __init__(self):
@@ -101,8 +129,10 @@ class RunHandler(webapp.RequestHandler):
     sys.stdout = new_stdout
 
     try:
-        compiled = compile(solution, 'submitted code', 'exec')
         namespace = {}
+        compiled = compile('from google.appengine.ext import db', 'submitted code', 'exec')
+        exec compiled in namespace
+        compiled = compile(solution, 'submitted code', 'exec')
         exec compiled in namespace
 
         test_cases = doctest.DocTestParser().get_examples(tests)
@@ -160,7 +190,7 @@ class RunHandler(webapp.RequestHandler):
         else:
           correct = False
           solved = False
-        resultDict = {'call':call, 'expected':expected, 'received': "%r" % got, 'correct':correct }
+        resultDict = {'call': call, 'expected': expected, 'received': "%(got)s" % {'got': got}, 'correct': correct}
         resultList.append(resultDict)
       return resultList, solved
 
@@ -240,6 +270,7 @@ def main():
     ('/run', RunHandler),
     ('/verify', VerifyHandler),
     ('/clean_database', CleanDatabaseHandler),
+    ('/keep_alive', KeepAliveHandler),
     ], debug=True)
   util.run_wsgi_app(app)
 

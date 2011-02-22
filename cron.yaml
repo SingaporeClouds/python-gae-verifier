@@ -2,3 +2,6 @@ cron:
 - description: Delete unused entities from database
   url: /clean_database
   schedule: every 60 minutes
+- description: Try to keep alive
+  url: /keep_alive
+  schedule: every 1 minutes
