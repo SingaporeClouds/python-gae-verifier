@@ -1,4 +1,4 @@
-application: pivotalapp
+application: python-gae-verifier
 version: 1
 runtime: python
 api_version: 1

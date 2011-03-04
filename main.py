@@ -181,7 +181,8 @@ class RunHandler(webapp.RequestHandler):
           exec e.source in namespace
           continue
         call = e.source.strip()
-        got = eval(e.source.strip(), namespace)
+        logging.warning('call: %s', (call,))
+        got = eval(call, namespace)
         expected = eval(e.want, namespace)
         
         correct = True
