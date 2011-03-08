@@ -134,6 +134,8 @@ class RunHandler(webapp.RequestHandler):
         exec compiled in namespace
         compiled = compile(solution, 'submitted code', 'exec')
         exec compiled in namespace
+        namespace['YOUR_SOLUTION'] = solution.strip()
+        namespace['LINES_IN_YOUR_SOLUTION'] = len(solution.strip().splitlines())
 
         test_cases = doctest.DocTestParser().get_examples(tests)
         results, solved = self.execute_test_cases(test_cases, namespace)
