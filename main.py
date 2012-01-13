@@ -189,7 +189,7 @@ class RunHandler(webapp.RequestHandler):
         
         correct = True
         if got == expected:
-          currect = True
+          correct = True
         else:
           correct = False
           solved = False
