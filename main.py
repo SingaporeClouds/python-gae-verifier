@@ -33,10 +33,14 @@ class VerifyHandler(webapp.RequestHandler):
   """ Allows the functions defined in the RPCMethods class to be RPCed."""
   def __init__(self):
     webapp.RequestHandler.__init__(self)
+  def get(self):
+    return self.post()
 
   def post(self):
     #The request is passed in as json in the variable jsonrequest
     jsonrequest = self.request.get('jsonrequest')
+    callback = self.request.get('callback')
+
     logging.info("Python verifier received: %s",jsonrequest)
     #The json request is passed to run_local and the result is written out as the response.
     try:
@@ -63,7 +67,12 @@ class VerifyHandler(webapp.RequestHandler):
         result = simplejson.dumps({'errors': '%s' % e})
     #logging.info('######## jsonResponse =%s', jsonResponse)
     #Change the MIME type to json.
-    self.response.out.write(result)
+    if callback:
+      logging.info("Callback request in jsonapi was %s", callback)
+      content = str(callback)+'('+result+')'
+      self.response.out.write(content)
+    else:
+        self.response.out.write(result)
 
 class KeepAliveHandler(webapp.RequestHandler):
   """ Allows the functions defined in the RPCMethods class to be RPCed."""
