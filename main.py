@@ -40,6 +40,7 @@ class VerifyHandler(webapp.RequestHandler):
     #The request is passed in as json in the variable jsonrequest
     jsonrequest = self.request.get('jsonrequest')
     callback = self.request.get('callback')
+    logging.info("jsonrequest=%s and callback=%s", jsonrequest, callback)
 
     logging.info("Python verifier received: %s",jsonrequest)
     #The json request is passed to run_local and the result is written out as the response.
@@ -50,14 +51,14 @@ class VerifyHandler(webapp.RequestHandler):
         result = urlfetch.fetch(url = url,
                                 payload = urllib.urlencode({'jsonrequest': jsonrequest}),
                                 method = urlfetch.POST,
-                                deadline = 3,
+                                deadline = 5,
                                 headers = {'Content-Type': 'application/x-www-form-urlencoded'})
         if result.status_code != 200:
             logging.error('The verifier returned an invalid status code: %s', result.status_code)
             logging.error('Content: %s', result.content)
         result = result.content
     except urlfetch.DownloadError:
-        s = "Your code took too long to return. Your solution may be stuck "+\
+        s = "Your code took more than 5 seconds to return. Your solution may be stuck "+\
             "in an infinite loop. Please try again."
         result = simplejson.dumps({"errors": s})
         logging.error(s)
@@ -91,7 +92,7 @@ class KeepAliveHandler(webapp.RequestHandler):
         result = urlfetch.fetch(url = url,
                                 payload = urllib.urlencode({'jsonrequest': jsonrequest}),
                                 method = urlfetch.POST,
-                                deadline = 3,
+                                deadline = 5,
                                 headers = {'Content-Type': 'application/x-www-form-urlencoded'})
         result = result.content
     except Exception, e:
