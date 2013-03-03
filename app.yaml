@@ -1,4 +1,4 @@
-application: python-gae-verifier
+application: ideone-verifier
 version: 3
 runtime: python
 api_version: 1
@@ -6,7 +6,7 @@ api_version: 1
 handlers:
 - url: /test.*
   script: gaeunit/gaeunit.py
-  
+
 - url: /.*
   script: main.py
 
